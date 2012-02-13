@@ -20,7 +20,6 @@ class Directory(Base):
 	parent_id = Column(Integer, ForeignKey('directories.id'))
 
 	parent = relationship('Directory', backref = backref('children'), remote_side = [id])
-	#children = relationship('Directory', lazy = 'joined', join_depth = 2)
 
 	def __init__(self, path, parent_id = None):
 		self.path = path
@@ -38,6 +37,16 @@ class Directory(Base):
 			session.add(directory)
 			session.commit()
 		return directory
+
+	def get_relpath(self):
+		return os.path.relpath(self.path, config.get('music_root'))
+
+	def dict(self):
+		return {
+			'type': 'dir',
+			'name': self.get_relpath(),
+			'metadata': {},
+		}
 
 class Artist(Base):
 	__tablename__ = 'artists'
@@ -159,6 +168,14 @@ class Track(Base):
 		if self.album:
 			metadata['album'] = self.album.name
 		return metadata
+
+	def dict(self):
+		return {
+			'type': 'track',
+			'name': self.get_relpath(),
+			'track': self.file_index,
+			'metadata': self.get_metadata(),
+		}
 
 Base.metadata.create_all(engine)
 
