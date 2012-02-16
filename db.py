@@ -134,6 +134,10 @@ class Track(Base):
 		return track
 
 	@staticmethod
+	def get_by_id(session, id):
+		return session.query(Track).filter(Track.id == id).one()
+
+	@staticmethod
 	def find(session, path, track = None):
 		directory, filename = os.path.split(path)
 		return session.query(Track).filter(and_(Track.filename == filename, Directory.path == directory, Track.file_index == track)).one()
@@ -171,6 +175,7 @@ class Track(Base):
 
 	def dict(self):
 		return {
+			'id': self.id,
 			'type': 'track',
 			'name': self.get_relpath(),
 			'track': self.file_index,

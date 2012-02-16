@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 
-import db, os, json, mimetypes
+import db, os, json, mimetypes, datetime
 from config import config
 
 class JSONApplication(object):
@@ -30,6 +30,8 @@ class JSONApplication(object):
 			return self.handlers[module](self, environ, start_response, path)
 
 class Application(object):
+	rfc1123_format = '%a, %d %b %Y %H:%M:%S +0000'
+
 	def __init__(self):
 		self.jsonapp = JSONApplication()
 
@@ -37,20 +39,67 @@ class Application(object):
 		path.pop(0)
 		return self.jsonapp(environ, start_response, path)
 
-	def static(self, environ, start_response, path):
-		filename = os.path.join('static', *path[1:])
-
-		if not os.path.exists(filename) or '..' in path:
+	def _serve_path(self, environ, start_response, filename):
+		if not os.path.exists(filename) or '..' in filename.split(os.path.sep):
 			start_response('404 Not Found', [])
 			return []
 
+		do_range = 'HTTP_RANGE' in environ
+		if do_range:
+			file_range = environ['HTTP_RANGE'].split('bytes=')[1]
+
 		mime = mimetypes.guess_type(filename, strict = False)[0] or 'application/octet-stream'
-		start_response('200 OK', [('Content-Type', mime)])
+		last_modified = datetime.datetime.fromtimestamp(os.path.getmtime(filename)).strftime(self.rfc1123_format)
+
+		# Range handling
+		if do_range:
+			start, end = [int(x or 0) for x in file_range.split('-')]
+			size = os.path.getsize(filename)
+
+			if end == 0:
+				end = size-1
+
+			write_out = start_response('206 Partial Content', [('Content-Type', mime),
+				('Content-Range', 'bytes {start}-{end}/{size}'.format(start = start, end = end, size = size)),
+				('Content-Length', str(end - start + 1)), ('Last-Modified', last_modified)])
+
+			f = open(filename, 'rb')
+			f.seek(start)
+			remaining = end-start+1
+			s = f.read(min(remaining, 1024))
+			while s:
+				write_out(s)
+				remaining -= len(s)
+				s = f.read(min(remaining, 1024))
+			return []
+
+		start_response('200 OK', [('Content-Type', mime), ('Content-Length', str(os.path.getsize(filename))),
+			('Last-Modified', last_modified)])
 		return open(filename, 'rb')
+
+	def static(self, environ, start_response, path):
+		filename = os.path.join('static', *path[1:])
+		return self._serve_path(environ, start_response, filename)
+
+	def track(self, environ, start_response, path):
+		track = int(path[1])
+		session = db.Session()
+		try:
+			track = db.Track.get_by_id(session, track)
+			filename = track.get_path()
+		except db.NoResultFound:
+			start_response('404 Not Found', [])
+			return []
+		finally:
+			session.close()
+
+		return self._serve_path(environ, start_response, filename)
 
 	handlers = {
 		'json': json,
 		'static': static,
+		'file': file,
+		'track': track,
 	}
 
 	def __call__(self, environ, start_response):
