@@ -5,12 +5,13 @@ from config import config
 
 class JSONApplication(object):
 	def list(self, environ, start_response, path):
-		root = os.path.join(config.get('music_root'), '/'.join(path[1:]))
-		if root[-1] == '/':
-			root = root[:-1]
+		root_id = int(path[1]) if len(path[1]) else 0
 		session = db.Session()
 		try:
-			directory = db.Directory.get(session, root)
+			if root_id > 0:
+				directory = db.Directory.get_by_id(session, root_id)
+			else:
+				directory = db.Directory.get(session, config.get('music_root'))
 			directories = directory.children
 			tracks = directory.tracks
 			contents = json.dumps([x.dict() for x in directories] +

@@ -38,11 +38,18 @@ class Directory(Base):
 			session.commit()
 		return directory
 
+	@staticmethod
+	def get_by_id(session, id):
+		return session.query(Directory).filter(Directory.id == id).one()
+
 	def get_relpath(self):
 		return os.path.relpath(self.path, config.get('music_root'))
 
 	def dict(self):
+		# FIXME: Recursively returns all parents, this is not very efficient.
 		return {
+			'id': self.id,
+			'parent': self.parent.dict() if self.parent else None,
 			'type': 'dir',
 			'name': self.get_relpath(),
 			'metadata': {},
