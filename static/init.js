@@ -13,6 +13,10 @@ function pause() {
 		sound.togglePause();
 }
 
+var templates = new (function Templates() {
+	this.directory_item = Handlebars.compile('<li class="{{type}}"><a href="#">{{name}}</a>');
+})();
+
 function load_directory(dir_id, dir_item) {
 	$.get('/json/list/' + dir_id, function(data) {
 		var dir_list = $('#directory-list');
@@ -31,9 +35,9 @@ function load_directory(dir_id, dir_item) {
 			);
 		}
 		$.each(data, function(i, item) {
-			var a = $('<a></a>').attr('href', '#').text(item.name);
+			var el = $(templates.directory_item(item));
 			if(item.type == "track") {
-				a.click(function() {
+				$(el, 'a').click(function() {
 					console.log(item);
 					if(sound) {
 						sound.destruct();
@@ -58,15 +62,13 @@ function load_directory(dir_id, dir_item) {
 					return false;
 				});
 			} else if(item.type == "dir") {
-				a.click(function() {
+				$(el).click(function() {
 					load_directory(item.id, item);
 					return false;
 				});
 			}
-			dir_list.append($('<li></li>')
-				.addClass(item.type)
-				.append(a)
-			);
+			$(el, 'a').click
+			dir_list.append(el);
 		});
 	});
 }
