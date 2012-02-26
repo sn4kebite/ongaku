@@ -5,7 +5,7 @@ from config import config
 
 class JSONApplication(object):
 	def list(self, environ, start_response, path):
-		root_id = int(path[1]) if len(path[1]) else 0
+		root_id = int(path[1]) if len(path) > 1 and len(path[1]) else 0
 		session = db.Session()
 		try:
 			if root_id > 0:
