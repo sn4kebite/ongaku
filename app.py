@@ -113,8 +113,8 @@ class Application(object):
 		if module in self.handlers:
 			return self.handlers[module](self, environ, start_response, path)
 
-		#start_response('200 OK', [('Content-Type', 'text/html')])
-		#return open('static/index.html', 'r')
+		start_response('404 Not Found', [])
+		return []
 
 if __name__ == '__main__':
 	import sys
