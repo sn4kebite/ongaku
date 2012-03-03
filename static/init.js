@@ -13,8 +13,27 @@ function pause() {
 		sound.togglePause();
 }
 
+Handlebars.registerHelper('trackname', function() {
+	var item = this;
+	if(!item.metadata)
+		return item.name;
+
+	var s = '';
+	if(item.metadata.title)
+		s = item.metadata.title;
+	if(item.metadata.artist) {
+		if(s.length) {
+			s = ' - ' + s;
+			s = item.metadata.artist + s;
+		}
+	}
+	if(!s.length)
+		s = item.name;
+	return s;
+});
+
 var templates = new (function Templates() {
-	this.directory_item = Handlebars.compile('<li class="{{type}}"><a href="#">{{name}}</a>');
+	this.directory_item = Handlebars.compile('<li class="{{type}}"><a href="#">{{trackname}}</a>');
 })();
 
 function load_directory(dir_id, dir_item) {
