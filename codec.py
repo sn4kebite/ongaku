@@ -58,8 +58,8 @@ class FFmpeg(Decoder):
 		cmd = 'ffmpeg -loglevel quiet'.split()
 		if 'start_time' in kwargs and kwargs['start_time']:
 			cmd += ['-ss', str(kwargs['start_time'])]
-			if 'end_time' in kwargs and kwargs['end_time']:
-				cmd += ['-t', str(kwargs['end_time'] - kwargs['start_time'])]
+		if 'end_time' in kwargs and kwargs['end_time']:
+			cmd += ['-t', str(kwargs['end_time'] - kwargs['start_time'])]
 		cmd += ['-i', self.source, '-y', self.destination]
 		devnull = open('/dev/null', 'a+')
 		p = subprocess.Popen(cmd, stderr = devnull, close_fds = True)
