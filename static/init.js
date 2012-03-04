@@ -83,8 +83,16 @@ function load_directory(dir_id, dir_item) {
 						},
 						onload: function(success) {
 							el.removeClass('loading').removeClass('nocache');
+							slider = $('#progress').slider({
+								max: sound.duration,
+								slide: function(event, ui) {
+									if(event.originalEvent)
+										sound.setPosition(ui.value);
+								}
+							});
 						},
 						whileplaying: function() {
+							$('#progress').slider("value", sound.position);
 							$('#' + id).addClass('playing');
 							var seconds = (this.position / 1000).toFixed(0);
 							var minutes = Math.floor(seconds / 60).toFixed(0);
@@ -119,4 +127,5 @@ function load_directory(dir_id, dir_item) {
 $(document).ready(function() {
 	preload_images();
 	load_directory(0);
+	$('#progress').slider();
 });

@@ -1,4 +1,5 @@
 * { padding: 0; margin: 0; }
+#progress { margin: .5em 1em; width: 300px; }
 #directory-list { font-size: small; }
 #directory-list a { color: inherit; text-decoration: inherit; }
 #directory-list a:hover { text-decoration: underline; }
