@@ -13,6 +13,16 @@ function pause() {
 		sound.togglePause();
 }
 
+function preload_images() {
+	var cache_images = new Array(
+		'loading.gif',
+		'music_playing.png'
+	);
+	$.each(cache_images, function() {
+		(new Image()).src = '/static/icons/' + this;
+	});
+}
+
 Handlebars.registerHelper('trackname', function() {
 	var item = this;
 	if(!item.metadata)
@@ -33,7 +43,7 @@ Handlebars.registerHelper('trackname', function() {
 });
 
 var templates = new (function Templates() {
-	this.directory_item = Handlebars.compile('<li class="{{type}}"><a href="#">{{trackname}}</a>');
+	this.directory_item = Handlebars.compile('<li id="{{type}}-{{id}}" class="{{type}}{{#if nocache}} nocache{{/if}}"><a href="#">{{trackname}}</a>');
 })();
 
 function load_directory(dir_id, dir_item) {
@@ -54,11 +64,15 @@ function load_directory(dir_id, dir_item) {
 			);
 		}
 		$.each(data, function(i, item) {
+			if(item.type == "track")
+				item.nocache = !item.cache;
 			var el = $(templates.directory_item(item));
+			var id = el.attr('id');
 			if(item.type == "track") {
 				$(el, 'a').click(function() {
-					console.log(item);
+					el.addClass('loading');
 					if(sound) {
+						sound.stop();
 						sound.destruct();
 					}
 					sound = soundManager.createSound({
@@ -67,7 +81,11 @@ function load_directory(dir_id, dir_item) {
 						whileloading: function() {
 							$('#status').text('Loading... ' + this.bytesLoaded);
 						},
+						onload: function(success) {
+							el.removeClass('loading').removeClass('nocache');
+						},
 						whileplaying: function() {
+							$('#' + id).addClass('playing');
 							var seconds = (this.position / 1000).toFixed(0);
 							var minutes = Math.floor(seconds / 60).toFixed(0);
 							seconds %= 60;
@@ -75,6 +93,12 @@ function load_directory(dir_id, dir_item) {
 								seconds = '0' + seconds;
 							var pos = minutes + ':' + seconds;
 							$('#status').text(pos);
+						},
+						onstop: function() {
+							$('#' + id).removeClass('playing');
+						},
+						onfinish: function() {
+							$('#' + id).removeClass('playing');
 						}
 					});
 					sound.play();
@@ -93,5 +117,6 @@ function load_directory(dir_id, dir_item) {
 }
 
 $(document).ready(function() {
+	preload_images();
 	load_directory(0);
 });

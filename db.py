@@ -165,7 +165,10 @@ class Track(Base):
 		return r.all()
 
 	def get_path(self):
-		return os.path.join(self.directory.path, self.filename)
+		s = os.path.join(self.directory.path, self.filename)
+		if isinstance(s, unicode):
+			s = s.encode('utf-8')
+		return s
 
 	def get_relpath(self):
 		return os.path.relpath(self.get_path(), config.get('music_root'))

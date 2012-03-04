@@ -1,4 +1,4 @@
-import subprocess, os
+import subprocess, os, cuesheet
 from config import config
 
 decoders = {}
@@ -54,8 +54,12 @@ class FFmpeg(Decoder):
 
 	test_exists = test_executable('ffmpeg')
 
-	def decode(self):
+	def decode(self, **kwargs):
 		cmd = 'ffmpeg -loglevel quiet'.split()
+		if 'start_time' in kwargs and kwargs['start_time']:
+			cmd += ['-ss', str(kwargs['start_time'])]
+			if 'end_time' in kwargs and kwargs['end_time']:
+				cmd += ['-t', str(kwargs['end_time'] - kwargs['start_time'])]
 		cmd += ['-i', self.source, '-y', self.destination]
 		devnull = open('/dev/null', 'a+')
 		p = subprocess.Popen(cmd, stderr = devnull, close_fds = True)
@@ -80,7 +84,16 @@ class DecoderNotFoundError(Exception): pass
 class EncoderNotFoundError(Exception): pass
 
 class Recoder(object):
-	def __init__(self, source, encoder):
+	def __init__(self, source, encoder, track = None, destination = None):
+		if track:
+			cue = cuesheet.Cuesheet(source)
+			source = os.path.join(os.path.dirname(source), cue.info[0].file[0])
+			track = cue.tracks[track-1]
+			self.start_time = track.get_start_time()
+			track = cue.get_next(track)
+			self.end_time = track.get_start_time() if track else None
+		else:
+			self.start_time, self.end_time = None, None
 		# TODO: Python 3 breakage (must be str)
 		if isinstance(encoder, basestring):
 			if not encoder in encoders:
@@ -89,9 +102,15 @@ class Recoder(object):
 
 		self.dec_source = source
 		# Boldly assume all decoders can convert to wave format.
-		self.dec_destination = os.path.join(config.get('cache_dir'), os.path.splitext(os.path.basename(source))[0] + '.wav')
+		if destination:
+			self.dec_destination = os.path.splitext(destination)[0] + '.wav'
+		else:
+			self.dec_destination = os.path.join(config.get('cache_dir'), os.path.splitext(os.path.basename(source))[0] + '.wav')
 		self.enc_source = self.dec_destination
-		self.enc_destination = os.path.splitext(self.dec_destination)[0] + encoder.extension
+		if destination:
+			self.enc_destination = os.path.splitext(destination)[0] + encoder.extension
+		else:
+			self.enc_destination = os.path.splitext(self.dec_destination)[0] + encoder.extension
 
 		self.decoder = None
 		for decoder in decoders.itervalues():
@@ -103,7 +122,7 @@ class Recoder(object):
 		self.encoder = encoder(self.enc_source, self.enc_destination)
 
 	def recode(self):
-		self.decoder.decode()
+		self.decoder.decode(start_time = self.start_time, end_time = self.end_time)
 		self.encoder.encode()
 		os.unlink(self.dec_destination)
 

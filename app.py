@@ -1,9 +1,26 @@
 #!/usr/bin/env python2
 
-import db, os, json, mimetypes, datetime
+import db, codec, os, json, mimetypes, datetime
 from config import config
 
 class JSONApplication(object):
+	@staticmethod
+	def cache_check(track):
+		ext = os.path.splitext(track.filename)[-1][1:]
+		if ext in config.get('allow_extensions').split():
+			return True
+		try:
+			r = codec.Recoder(track.get_path(), config.get('encoder'), track.file_index, os.path.join(config.get('cache_dir'), str(track.id)))
+		except codec.DecoderNotFoundError:
+			return False
+		return os.path.exists(r.enc_destination)
+
+	@staticmethod
+	def format_track(track):
+		d = track.dict()
+		d['cache'] = JSONApplication.cache_check(track)
+		return d
+
 	def list(self, environ, start_response, path):
 		root_id = int(path[1]) if len(path) > 1 and len(path[1]) else 0
 		session = db.Session()
@@ -15,7 +32,7 @@ class JSONApplication(object):
 			directories = directory.children
 			tracks = directory.tracks
 			contents = json.dumps([x.dict() for x in directories] +
-				[x.dict() for x in tracks])
+				[self.format_track(x) for x in tracks])
 		finally:
 			session.close()
 		start_response('200 OK', [('Content-Type', 'application/json'), ('Content-Length', str(len(contents)))])
@@ -88,6 +105,12 @@ class Application(object):
 		try:
 			track = db.Track.get_by_id(session, track)
 			filename = track.get_path()
+			ext = os.path.splitext(filename)[-1][1:]
+			if not ext in config.get('allow_extensions').split():
+				r = codec.Recoder(filename, config.get('encoder'), track.file_index, os.path.join(config.get('cache_dir'), str(track.id)))
+				filename = r.enc_destination
+				if not os.path.exists(filename):
+					r.recode()
 		except db.NoResultFound:
 			start_response('404 Not Found', [])
 			return []
