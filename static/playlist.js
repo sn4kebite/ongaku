@@ -29,7 +29,9 @@ $(function(){
 		initialize: function() {
 			items.bind('add', this.addOne, this);
 			items.bind('remove', this.removeOne, this);
+			items.bind('reset', this.addAll, this);
 			this.current = null;
+			items.fetch();
 		},
 		add: function(item) {
 			var model = items.create(item);
@@ -43,6 +45,10 @@ $(function(){
 		},
 		removeOne: function(item) {
 			$('#playlist #cid-' + item.cid).remove();
+			item.destroy();
+		},
+		addAll: function() {
+			items.each(this.addOne);
 		},
 		next: function() {
 			var item = items.at(0);
