@@ -1,11 +1,13 @@
 * { padding: 0; margin: 0; }
+.ui-tabs-nav li a { font-size: small; }
 #progress { margin: .5em 1em; width: 300px; }
-#directory-list { font-size: small; }
-#directory-list a { color: inherit; text-decoration: inherit; }
-#directory-list a:hover { text-decoration: underline; }
-#directory-list .dir, #directory-list .track { background-repeat: no-repeat; padding-left: 20px; }
+#directory-list, #playlist { font-size: small; }
+#directory-list a, #playlist a { color: inherit; text-decoration: inherit; }
+#directory-list a:hover, #playlist a:hover { text-decoration: underline; }
+#directory-list .dir, #directory-list .track, #playlist li { background-repeat: no-repeat; padding-left: 20px; }
 #directory-list .dir { background-image: url('/static/icons/folder.png'); }
 #directory-list .track { background-image: url('/static/icons/music.png'); }
-#directory-list .nocache { background-image: url('/static/icons/music_nocache.png'); }
-#directory-list .loading { background-image: url('/static/icons/loading.gif'); }
-#directory-list .playing { background-image: url('/static/icons/music_playing.png'); }
+#directory-list .nocache, #playlist .nocache { background-image: url('/static/icons/music_nocache.png'); }
+#directory-list, #playlist { list-style-type: none; }
+#playlist .playing { background-image: url('/static/icons/music_playing.png'); }
+#playlist .loading { background-image: url('/static/icons/loading.gif'); }

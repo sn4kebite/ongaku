@@ -6,9 +6,14 @@
 	<script type="text/javascript" src="/static/jquery-ui-1.8.18.custom.min.js"></script>
 	<script type="text/javascript" src="/static/soundmanager2-jsmin.js"></script>
 	<script type="text/javascript" src="/static/handlebars-1.0.0.beta.6.js"></script>
+	<script type="text/javascript" src="/static/underscore-min.js"></script>
+	<script type="text/javascript" src="/static/backbone-min.js"></script>
+	<script type="text/javascript" src="/static/backbone-localstorage.js"></script>
+	<script type="text/javascript" src="/static/sound.js"></script>
+	<script type="text/javascript" src="/static/playlist.js"></script>
 	<script type="text/javascript" src="/static/init.js"></script>
-	<link rel="stylesheet" href="/static/style.css" type="text/css" />
 	<link rel="stylesheet" href="/static/jquery-ui-1.8.18.custom.css" type="text/css" />
+	<link rel="stylesheet" href="/static/style.css" type="text/css" />
 </head>
 <body>
 	<div id="content">
@@ -19,8 +24,20 @@
 			<a href="javascript:pause()"><img src="/static/icons/control_pause_blue.png" alt="Play" /></a>
 			<div id="progress"></div>
 		</div>
-		<ul id="directory-list">
-		</ul>
+		<div id="tabs">
+			<ul>
+				<li><a href="#directory-tab">Directories</a></li>
+				<li><a href="#playlist-tab">Playlist</a></li>
+			</ul>
+			<div id="directory-tab">
+				<ul id="directory-list">
+				</ul>
+			</div>
+			<div id="playlist-tab">
+				<ul id="playlist">
+				</ul>
+			</div>
+		</div>
 	</div>
 </body>
 </html>

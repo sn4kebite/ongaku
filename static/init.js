@@ -70,46 +70,7 @@ function load_directory(dir_id, dir_item) {
 			var id = el.attr('id');
 			if(item.type == "track") {
 				$(el, 'a').click(function() {
-					el.addClass('loading');
-					if(sound) {
-						sound.stop();
-						sound.destruct();
-					}
-					sound = soundManager.createSound({
-						id: 'audio',
-						url: '/track/' + item.id,
-						whileloading: function() {
-							$('#status').text('Loading... ' + this.bytesLoaded);
-						},
-						onload: function(success) {
-							el.removeClass('loading').removeClass('nocache');
-							slider = $('#progress').slider({
-								max: sound.duration,
-								slide: function(event, ui) {
-									if(event.originalEvent)
-										sound.setPosition(ui.value);
-								}
-							});
-						},
-						whileplaying: function() {
-							$('#progress').slider("value", sound.position);
-							$('#' + id).addClass('playing');
-							var seconds = (this.position / 1000).toFixed(0);
-							var minutes = Math.floor(seconds / 60).toFixed(0);
-							seconds %= 60;
-							if(seconds < 10)
-								seconds = '0' + seconds;
-							var pos = minutes + ':' + seconds;
-							$('#status').text(pos);
-						},
-						onstop: function() {
-							$('#' + id).removeClass('playing');
-						},
-						onfinish: function() {
-							$('#' + id).removeClass('playing');
-						}
-					});
-					sound.play();
+					playlist.add(item);
 					return false;
 				});
 			} else if(item.type == "dir") {
@@ -125,6 +86,7 @@ function load_directory(dir_id, dir_item) {
 }
 
 $(document).ready(function() {
+	$('#tabs').tabs();
 	preload_images();
 	load_directory(0);
 	$('#progress').slider();
