@@ -1,6 +1,6 @@
 function playsound(model) {
 	var item = model.toJSON();
-	var id = item.id;
+	var id = item.track_id;
 	var cid = model.cid;
 	var el = $('#cid-' + cid);
 	el.addClass('loading');
@@ -10,7 +10,7 @@ function playsound(model) {
 	}
 	sound = soundManager.createSound({
 		id: 'audio',
-		url: '/track/' + item.id,
+		url: '/track/' + id,
 		whileloading: function() {
 			$('#status').text('Loading... ' + this.bytesLoaded);
 			el.addClass('loading');

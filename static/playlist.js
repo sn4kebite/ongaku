@@ -25,6 +25,7 @@ $(function(){
 		}
 	});
 	PlaylistView = Backbone.View.extend({
+		current_id: 1,
 		el: $('#playlist'),
 		initialize: function() {
 			items.bind('add', this.addOne, this);
@@ -34,6 +35,9 @@ $(function(){
 			items.fetch();
 		},
 		add: function(item) {
+			item.track_id = item.id;
+			item.id = this.current_id;
+			this.current_id++;
 			var model = items.create(item);
 		},
 		addOne: function(item) {
