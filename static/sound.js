@@ -1,4 +1,5 @@
 function playsound(model) {
+	playlist.hintnext();
 	var item = model.toJSON();
 	var id = item.track_id;
 	var cid = model.cid;
@@ -50,4 +51,11 @@ function playsound(model) {
 	});
 	sound.play();
 	$('#cid-' + cid).addClass('playing');
+}
+
+function sound_hint(model) {
+	$('#cid-' + model.cid).addClass('loading');
+	$.get('/json/hint/' + model.attributes.track_id, function(data) {
+		$('#cid-' + model.cid).removeClass('nocache').removeClass('loading');
+	});
 }

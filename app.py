@@ -38,8 +38,25 @@ class JSONApplication(object):
 		start_response('200 OK', [('Content-Type', 'application/json'), ('Content-Length', str(len(contents)))])
 		return [contents]
 
+	def hint(self, environ, start_response, path):
+		track_id = int(path[1])
+		session = db.Session()
+		try:
+			track = db.Track.get_by_id(session, track_id)
+			cached = self.cache_check(track)
+		finally:
+			session.close()
+
+		if not cached:
+			r = codec.Recoder(track.get_path(), config.get('encoder'), track.file_index, os.path.join(config.get('cache_dir'), str(track.id)))
+			r.recode()
+
+		start_response('200 OK', [('Content-Type', 'application/json')])
+		return [json.dumps({'recoded': not cached})]
+
 	handlers = {
 		'list': list,
+		'hint': hint,
 	}
 
 	def __call__(self, environ, start_response, path):

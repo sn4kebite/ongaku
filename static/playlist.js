@@ -39,6 +39,9 @@ $(function(){
 			item.id = this.current_id;
 			this.current_id++;
 			var model = items.create(item);
+			if(items.indexOf(model) < 2) {
+				sound_hint(model);
+			}
 		},
 		addOne: function(item) {
 			var view = new PlaylistItemView({model: item});
@@ -60,6 +63,11 @@ $(function(){
 			items.remove(item);
 			this.render();
 			return next;
+		},
+		hintnext: function() {
+			var next = items.at(1);
+			if(next)
+				sound_hint(next);
 		}
 	});
 
