@@ -1,7 +1,7 @@
 function playsound(model) {
 	playlist.hintnext();
 	var item = model.toJSON();
-	var id = item.track_id;
+	var id = item.id;
 	var cid = model.cid;
 	var el = $('#cid-' + cid);
 	el.addClass('loading');
@@ -55,7 +55,7 @@ function playsound(model) {
 
 function sound_hint(model) {
 	$('#cid-' + model.cid).addClass('loading');
-	$.get('/json/hint/' + model.attributes.track_id, function(data) {
+	$.get('/json/hint/' + model.id, function(data) {
 		$('#cid-' + model.cid).removeClass('nocache').removeClass('loading');
 	});
 }

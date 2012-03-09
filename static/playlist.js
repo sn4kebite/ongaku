@@ -2,7 +2,10 @@ $(function(){
 	PlaylistItem = Backbone.Model.extend({});
 	Playlist = Backbone.Collection.extend({
 		model: PlaylistItem,
-		localStorage: new Store("playlist")
+		localStorage: new Store("playlist"),
+		comparator: function(item) {
+			return item.attributes.order_id;
+		}
 	});
 	window.items = new Playlist;
 	PlaylistItemView = Backbone.View.extend({
@@ -25,7 +28,6 @@ $(function(){
 		}
 	});
 	PlaylistView = Backbone.View.extend({
-		current_id: 1,
 		el: $('#playlist'),
 		initialize: function() {
 			items.bind('add', this.addOne, this);
@@ -35,9 +37,7 @@ $(function(){
 			items.fetch();
 		},
 		add: function(item) {
-			item.track_id = item.id;
-			item.id = this.current_id;
-			this.current_id++;
+			item.order_id = items.length+1;
 			var model = items.create(item);
 			if(items.indexOf(model) < 2) {
 				sound_hint(model);
