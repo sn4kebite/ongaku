@@ -90,4 +90,17 @@ $(document).ready(function() {
 	preload_images();
 	load_directory(0);
 	$('#progress').slider();
+	$('#playlist tbody').sortable({
+		items: 'tr:not(.playing)',
+		cancel: '.playing',
+		update: function() {
+			$('#playlist tbody tr').each(function(i, tr) {
+				var cid = $(tr).attr('id').match(/^cid-(c\d+)$/)[1];
+				var model = items.getByCid(cid);
+				model.attributes.order_id = i+1;
+				model.save();
+			});
+			items.sort({silent: true});
+		}
+	});
 });
