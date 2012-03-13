@@ -9,26 +9,31 @@ $(function(){
 	});
 	window.items = new Playlist;
 	PlaylistItemView = Backbone.View.extend({
-		tagName: 'li',
-		template: Handlebars.compile('<a href="#">{{trackname}}</a>'),
+		tagName: 'tr',
+		template: Handlebars.compile('<td><a href="#" class="play">{{trackname}}</a></td><td><a href="#" class="delete"><img src="/static/icons/delete.png" alt="Delete" title="Delete" /></a></td>'),
 		render: function() {
 			var model = this.model;
 			var item = model.toJSON();
 			var el = $(this.el);
 			el.html(this.template(item));
 			el.attr('id', 'cid-' + model.cid);
-			$(this.el, 'a').click(function() {
+			$('a.play', this.el).click(function() {
 				while(model.collection.indexOf(model) > 0) {
 					model.collection.remove(model.collection.at(0));
 				}
 				playsound(model);
 				return false;
 			});
+			$('a.delete', this.el).click(function() {
+				//var model = items.getByCid(model.cid);
+				items.remove(model);
+				return false;
+			});
 			return this;
 		}
 	});
 	PlaylistView = Backbone.View.extend({
-		el: $('#playlist'),
+		el: $('#playlist tbody'),
 		initialize: function() {
 			items.bind('add', this.addOne, this);
 			items.bind('remove', this.removeOne, this);
@@ -53,6 +58,11 @@ $(function(){
 		removeOne: function(item) {
 			$('#playlist #cid-' + item.cid).remove();
 			item.destroy();
+			items.each(this.refreshOrder);
+		},
+		refreshOrder: function(item) {
+			item.attributes.order_id = items.indexOf(item)+1;
+			item.save();
 		},
 		addAll: function() {
 			items.each(this.addOne);
