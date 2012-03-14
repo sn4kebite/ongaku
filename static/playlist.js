@@ -10,7 +10,7 @@ $(function(){
 	window.items = new Playlist;
 	PlaylistItemView = Backbone.View.extend({
 		tagName: 'tr',
-		template: Handlebars.compile('<td><a href="#" class="play">{{trackname}}</a></td><td><a href="#" class="delete"><img src="/static/icons/delete.png" alt="Delete" title="Delete" /></a></td>'),
+		template: templates.playlist_item,
 		render: function() {
 			var model = this.model;
 			var item = model.toJSON();
@@ -54,6 +54,11 @@ $(function(){
 			if(item.attributes.nocache)
 				$(el).addClass('nocache');
 			$('#playlist').append(el);
+			if(item.attributes.cache !== undefined || item.attributes.nocache !== undefined) {
+				delete item.attributes.cache;
+				delete item.attributes.nocache;
+				item.save();
+			}
 		},
 		removeOne: function(item) {
 			$('#playlist #cid-' + item.cid).remove();

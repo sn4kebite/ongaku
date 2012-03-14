@@ -13,5 +13,6 @@
 #playlist .loading a.play { background-image: url('/static/icons/loading.gif'); }
 #playlist { border-collapse: collapse; background: white; width: 100%; }
 #playlist tr td:first-child { width: 100%; }
-#playlist td { padding: .3em; background: white; border: 1px solid #ddd; }
+#playlist td { padding: .3em; background: white; border: 1px solid #ddd; border-width: 0 1px; }
+#playlist tr:last-child td { border-bottom-width: 1px; }
 #playlist th { background: #ddd; text-align: left; padding: .5em; }
