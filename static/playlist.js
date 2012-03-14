@@ -25,8 +25,8 @@ $(function(){
 				return false;
 			});
 			$('a.delete', this.el).click(function() {
-				//var model = items.getByCid(model.cid);
 				items.remove(model);
+				playlist.hintnext();
 				return false;
 			});
 			return this;

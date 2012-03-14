@@ -101,6 +101,7 @@ $(document).ready(function() {
 				model.save();
 			});
 			items.sort({silent: true});
+			playlist.hintnext();
 		}
 	});
 });
