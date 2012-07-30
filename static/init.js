@@ -62,6 +62,21 @@ function load_directory(dir_id, dir_item) {
 	});
 }
 
+function search_results(data) {
+	var results = $('#search-results');
+	results.empty();
+	$.each(data, function(i, track) {
+		var li = $(templates.directory_item(track));
+		console.log(li);
+		$(li, 'a').click(function() {
+			console.log('clicked');
+			playlist.add(track);
+			return false;
+		});
+		results.append(li);
+	});
+}
+
 $(document).ready(function() {
 	$('#tabs').tabs();
 	preload_images();
@@ -79,6 +94,12 @@ $(document).ready(function() {
 			});
 			items.sort({silent: true});
 			playlist.hintnext();
+		}
+	});
+	$('#search_box').keypress(function(event) {
+		if(event.keyCode == 13) {
+			var val = $(this).val();
+			$.get('/json/search?q=' + escape(val), search_results, 'json');
 		}
 	});
 });

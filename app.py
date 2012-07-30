@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 
-import db, codec, os, json, mimetypes, datetime
+import db, codec, os, json, mimetypes, datetime, re, cgi
 from config import config
 
 class JSONApplication(object):
@@ -54,9 +54,36 @@ class JSONApplication(object):
 		start_response('200 OK', [('Content-Type', 'application/json')])
 		return [json.dumps({'recoded': not cached})]
 
+	re_search = re.compile(r'(")?((?(1)[^"]|[^ ])+)(?(1)")')
+
+	def search(self, environ, start_response, path):
+		args = cgi.FieldStorage(environ = environ)
+		query = args.getvalue('q')
+		r = self.re_search.findall(query)
+		d = {}
+		l = []
+		for _, v in r:
+			if ':' in v:
+				k, v = v.split(':', 1)
+				d[k] = v
+			else:
+				l.append(v)
+
+		results = []
+		try:
+			session = db.Session()
+			r = db.Track.search(session, *l, **d)
+			results = [x.dict() for x in r]
+		finally:
+			session.close()
+
+		start_response('200 OK', [])
+		return json.dumps(results)
+
 	handlers = {
 		'list': list,
 		'hint': hint,
+		'search': search,
 	}
 
 	def __call__(self, environ, start_response, path):
