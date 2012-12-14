@@ -73,7 +73,7 @@ class JSONApplication(object):
 		try:
 			session = db.Session()
 			r = db.Track.search(session, *l, **d)
-			results = [x.dict() for x in r]
+			results = [self.format_track(x) for x in r]
 		finally:
 			session.close()
 

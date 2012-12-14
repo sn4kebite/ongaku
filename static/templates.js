@@ -3,21 +3,14 @@ Handlebars.registerHelper('trackname', function() {
 	if(!item.metadata)
 		return item.name;
 
-	var s = '';
 	if(item.metadata.title)
-		s = item.metadata.title;
-	if(item.metadata.artist) {
-		if(s.length) {
-			s = ' - ' + s;
-			s = item.metadata.artist + s;
-		}
-	}
-	if(!s.length)
-		s = item.name;
-	return s;
+		return item.metadata.title;
+	else
+		return item.name;
 });
 
 var templates = new (function Templates() {
-	this.directory_item = Handlebars.compile('<li id="{{type}}-{{id}}" class="{{type}}{{#if nocache}} nocache{{/if}}"><a href="#">{{trackname}}</a>');
-	this.playlist_item = Handlebars.compile('<td><a href="#" class="play">{{trackname}}</a></td><td><a href="#" class="delete"><img src="/static/icons/delete.png" alt="Delete" title="Delete" /></a></td>');
+	this.directory_item = Handlebars.compile('<tr id="{{type}}-{{id}}"><td><a href="#" class="{{type}}{{#unless cache}} nocache{{/unless}}">{{trackname}}</a></td><td>{{metadata.artist}}</td><td>{{metadata.album}}</td></tr>');
+	// The playlist automatically adds a tr tag.
+	this.playlist_item = Handlebars.compile('<td><a href="#" class="play">{{trackname}}</a></td><td><a href="#">{{metadata.artist}}</a></td><td><a href="#">{{metadata.album}}</a></td><td class="track-buttons"><a href="#" class="delete"><img src="/static/icons/delete.png" alt="Delete" title="Delete" /></a></td>');
 })();

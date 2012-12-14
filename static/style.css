@@ -1,19 +1,24 @@
 * { padding: 0; margin: 0; }
 .ui-tabs-nav li a { font-size: small; }
 #progress { margin: .5em 1em; width: 300px; }
-#directory-list, #playlist, #search-results { font-size: small; }
-#directory-list a, #playlist a, #search-results a { color: inherit; text-decoration: inherit; }
-#directory-list a:hover, #playlist a:hover, #search-results a:hover { text-decoration: underline; }
-#directory-list .dir, #directory-list .track, #playlist a.play, #search-results .track { background-repeat: no-repeat; padding-left: 20px; }
-#directory-list .dir { background-image: url('/static/icons/folder.png'); }
-#directory-list .track, #search-results .track { background-image: url('/static/icons/music.png'); }
-#directory-list .nocache, #playlist .nocache a.play { background-image: url('/static/icons/music_nocache.png'); }
-#directory-list, #search-results { list-style-type: none; }
+#tabs { font-size: 100%; }
+.accessor { text-decoration: underline; }
+
+.track-table { width: 100%; }
+.track-table tr:nth-child(odd) td { background: #eee; }
+.track-table tr:nth-child(even) td { background: #ddd; }
+.track-table tr.ui-selected td { background-color: #fea; }
+.track-table tr:hover td { background-color: #fbb; }
+
+.track-table a { color: inherit; text-decoration: inherit; background-repeat: no-repeat; padding-left: 20px; display: block; }
+.track-table a:hover { text-decoration: underline; }
+.track-table .dir { background-image: url('/static/icons/folder.png'); }
+.track-table .track { background-image: url('/static/icons/music.png'); }
+.track-table .track.nocache { background-image: url('/static/icons/music_nocache.png'); }
+
 #playlist .playing a.play { background-image: url('/static/icons/music_playing.png'); }
 #playlist .loading a.play { background-image: url('/static/icons/loading.gif'); }
-#playlist { border-collapse: collapse; background: white; width: 100%; }
-#playlist tr td:first-child { width: 100%; }
-#playlist td { padding: .3em; background: white; border: 1px solid #ddd; border-width: 0 1px; }
-#playlist tr:last-child td { border-bottom-width: 1px; }
-#playlist th { background: #ddd; text-align: left; padding: .5em; }
+#playlist tr td.track-buttons { width: 1em; }
+
+#search_box { border: 1px solid #888; border-radius: 10px; padding: 0 .3em; }
 #search-results { margin-top: 1em; }

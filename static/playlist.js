@@ -51,12 +51,9 @@ $(function(){
 		addOne: function(item) {
 			var view = new PlaylistItemView({model: item});
 			var el = view.render().el;
-			if(item.attributes.nocache)
-				$(el).addClass('nocache');
 			$('#playlist').append(el);
-			if(item.attributes.cache !== undefined || item.attributes.nocache !== undefined) {
+			if(item.attributes.cache !== undefined) {
 				delete item.attributes.cache;
-				delete item.attributes.nocache;
 				item.save();
 			}
 		},

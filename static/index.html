@@ -27,30 +27,58 @@
 		</div>
 		<div id="tabs">
 			<ul>
-				<li><a href="#directory-tab">Directories</a></li>
-				<li><a href="#playlist-tab">Playlist</a></li>
-				<li><a href="#search-tab">Search</a></li>
+				<li><a href="#playlist-tab" accesskey="p"><span class="accessor">P</span>laylist</a></li>
+				<li><a href="#search-tab" accesskey="s"><span class="accessor">S</span>earch</a></li>
+				<li><a href="#directory-tab" accesskey="d"><span class="accessor">D</span>irectories</a></li>
 			</ul>
-			<div id="directory-tab">
-				<ul id="directory-list">
-				</ul>
-			</div>
 			<div id="playlist-tab">
-				<table id="playlist">
-					<thead>
-						<tr>
-							<th>Name</th>
-							<th>&nbsp;</th>
-						</tr>
-					</thead>
-					<tbody>
-					</tbody>
+				<table class="track-table">
+				<thead>
+					<tr>
+						<th>Title</th>
+						<th>Artist</th>
+						<th>Album</th>
+						<th>&nbsp;</th>
+					</tr>
+				</thead>
+				<tbody id="playlist">
+				</tbody>
 				</table>
 			</div>
 			<div id="search-tab">
 				<input type="text" id="search_box" />
-				<ul id="search-results">
-				</ul>
+				<span>
+					<input type="button" id="search-add" value="Add selected" />
+				</span>
+				<table class="track-table">
+				<thead>
+					<tr>
+						<th>Title</th>
+						<th>Artist</th>
+						<th>Album</th>
+					</tr>
+				</thead>
+				<tbody id="search-results">
+					<tr>
+						<td colspan="3" style="font-style: italic">Use the search box above to find music.</td>
+					</tr>
+				</tbody>
+				</table>
+			</div>
+			<div id="directory-tab">
+				<table id="directory-table" class="track-table">
+				<thead>
+					<tr>
+						<th>Title</th>
+						<th>Artist</th>
+						<th>Album</th>
+					</tr>
+				</thead>
+				<tbody id="directory-list">
+					<tr>
+					</tr>
+				</tbody>
+				</table>
 			</div>
 		</div>
 	</div>
