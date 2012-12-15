@@ -1,4 +1,4 @@
-import os, mimetypes, cuesheet, mutagen, db
+import os, mimetypes, cuesheet, mutagen, db, traceback
 
 from config import config
 
@@ -55,7 +55,11 @@ class Directory(DirectoryEntry):
 						files.append(File(path, track = t.track[0], metadata = metadata))
 				else:
 					metadata = {}
-					tags = mutagen.File(path) or []
+					try:
+						tags = mutagen.File(path) or []
+					except:
+						tags = []
+						traceback.print_exc()
 					if isinstance(tags, mutagen.mp3.MP3):
 						for id3, tn in (('TPE1', 'artist'), ('TALB', 'album'), ('TIT2', 'title')):
 							if id3 in tags:
@@ -63,7 +67,9 @@ class Directory(DirectoryEntry):
 					else:
 						for tn in ('artist', 'album', 'title'):
 							if tn in tags:
-								metadata[tn] = tags[tn][0].encode('utf-8')
+								s = tags[tn][0].encode('utf-8', 'replace')
+								if len(s):
+									metadata[tn] = s
 					files.append(File(path, metadata = metadata))
 		return sorted(directories) + sorted(files)
 
@@ -114,10 +120,15 @@ def rec_scan(session, root, parent_id = None):
 			rec_scan(session, de.path, directory.id)
 		else:
 			print de.metadata
-			artist = db.Artist.get(session, de.metadata['artist']) if 'artist' in de.metadata else None
-			album = db.Album.get(session, de.metadata['album'], artist.id if artist else None) if 'album' in de.metadata else None
-			track = db.Track.get(session, de.metadata['title'] if 'title' in de.metadata else None, None,
-				os.path.basename(de.path), de.track, directory.id, artist.id if artist else None, album.id if album else None)
+			try:
+				artist = db.Artist.get(session, de.metadata['artist']) if 'artist' in de.metadata else None
+				album = db.Album.get(session, de.metadata['album'], artist.id if artist else None) if 'album' in de.metadata else None
+				track = db.Track.get(session, de.metadata['title'] if 'title' in de.metadata else None, None,
+					os.path.basename(de.path), de.track, directory.id, artist.id if artist else None, album.id if album else None)
+			except:
+				print de
+				print type(de.path), repr(de.path)
+				raise
 
 def scan(root = None):
 	if not root:
