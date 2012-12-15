@@ -82,7 +82,7 @@ class Album(Base):
 
 	id = Column(Integer, primary_key = True)
 	name = Column(String, nullable = False, index = True)
-	artist_id = Column(Integer, ForeignKey('artists.id'), nullable = False)
+	artist_id = Column(Integer, ForeignKey('artists.id'))
 
 	artist = relationship(Artist, backref = backref('albums', order_by = name))
 
