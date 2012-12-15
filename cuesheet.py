@@ -8,6 +8,9 @@ cdtext_re = {
 	'TRACK': r'^(TRACK) (\d+) (AUDIO|CDG|MODE1/2048|MODE1/2352|MODE2/2336|MODE2/2352|CDI/2336|CDI2352)$',
 	'INDEX': r'^(INDEX) (\d+) (\d+):(\d+):(\d+)$',
 	'FLAGS': r'^((?:DCP|4CH|PRE|SCMS) ?){1,4}$',
+	'ISRC': r'^(ISRC) (\w{5}\d{7})$',
+	'SONGWRITER': r'^(SONGWRITER) "?(.+?)"?$',
+	'CATALOG': r'^(CATALOG) (\d{13})$',
 }
 
 for k, v in cdtext_re.iteritems():
@@ -85,7 +88,10 @@ class Cuesheet(object):
 		if not f.read(3) == '\xef\xbb\xbf':
 			f.seek(0)
 		for line in f:
-			cdtext = CDText(line.strip())
+			line = line.strip()
+			if not len(line):
+				continue
+			cdtext = CDText(line)
 			if cdtext.type == 'TRACK':
 				track = Track()
 				tracks.append(track)
