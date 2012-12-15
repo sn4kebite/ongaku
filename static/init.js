@@ -25,8 +25,10 @@ function preload_images() {
 
 function load_directory(dir_id, dir_item) {
 	$.get('/json/list/' + dir_id, function(data) {
-		var dir_list = $('#directory-list');
+		var dir_list = $('#directory-dirs');
+		var track_list = $('#directory-tracks');
 		dir_list.html('');
+		track_list.html('');
 		if(dir_item && dir_item.parent) {
 			dir_list.append($('<tr></tr>').append($('<td></td>').attr('colspan', 3)
 				.append($('<a></a>')
@@ -44,20 +46,33 @@ function load_directory(dir_id, dir_item) {
 			var el = $(templates.directory_item(item));
 			var id = el.attr('id');
 			if(item.type == "track") {
-				$(el, 'a').click(function() {
+				el.data('track', item);
+				// FIXME: This doesn't work with selectable
+				/*$(el, 'a').dblclick(function() {
+					console.log('track: ', item);
 					playlist.add(item);
+					return true;
+				}).click(function() {
 					return false;
-				});
+				});*/
+				track_list.append(el);
 			} else if(item.type == "dir") {
 				$(el).click(function() {
 					load_directory(item.id, item);
 					return false;
 				});
+				dir_list.append(el);
 			}
-			$(el, 'a').click
-			dir_list.append(el);
+		});
+		track_list.selectable({
+			filter: 'tr',
+			stop: function(event, ui) {
+				$('#directory-add').prop('disabled', $(track_list, ' .ui-selected').length == 0);
+				return true;
+			}
 		});
 	});
+	$('#directory-add').prop('disabled', true);
 }
 
 function search_results(data) {
@@ -106,6 +121,13 @@ $(document).ready(function() {
 	$('#search-add').click(function(event) {
 		var tracks = $('#search-results tr.ui-selected');
 		console.log(tracks);
+		tracks.each(function(i, item) {
+			var track = $(item).data('track');
+			playlist.add(track);
+		});
+	}).prop('disabled', true);
+	$('#directory-add').click(function(event) {
+		var tracks = $('#directory-tracks tr.ui-selected');
 		tracks.each(function(i, item) {
 			var track = $(item).data('track');
 			playlist.add(track);
