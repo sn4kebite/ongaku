@@ -41,8 +41,6 @@ def get_coverart(album, ignorecache = False):
 	cover = []
 	for f in files:
 		filename = os.path.join(dirname, f)
-		if os.path.isdir(filename):
-			print filename
 		if os.path.isdir(filename) and f.lower() in ('scans', 'jpg', 'jpeg', 'img', 'image', 'cover', 'covers'):
 			files.extend(os.path.join(f, x) for x in os.listdir(filename))
 			files.sort()
