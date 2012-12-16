@@ -47,6 +47,7 @@ function playsound(model) {
 			if(next) {
 				playsound(next, $('#cid-' + next.cid));
 			} else {
+				$('#status').text('');
 				sound.stop();
 				sound.destruct();
 				sound = null;
