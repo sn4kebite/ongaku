@@ -21,7 +21,7 @@ function playsound(model) {
 			slider = $('#progress').slider({
 				max: sound.duration,
 				slide: function(event, ui) {
-					if(event.originalEvent)
+					if(event.originalEvent && sound)
 						sound.setPosition(ui.value);
 				}
 			});
@@ -46,6 +46,10 @@ function playsound(model) {
 			var next = playlist.next();
 			if(next) {
 				playsound(next, $('#cid-' + next.cid));
+			} else {
+				sound.stop();
+				sound.destruct();
+				sound = null;
 			}
 		}
 	});
