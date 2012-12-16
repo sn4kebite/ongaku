@@ -1,7 +1,12 @@
 * { padding: 0; margin: 0; }
+html, body, #content { height: 100%; }
+#tabs { height: 90%; }
+
 .ui-tabs-nav li a { font-size: small; }
+#tabs #albums-tab.ui-tabs-panel { padding: 0; }
 #progress { margin: .5em 1em; width: 300px; }
 #tabs { font-size: 100%; }
+
 .accessor { text-decoration: underline; }
 
 .track-table { width: 100%; }
@@ -22,3 +27,10 @@
 
 #search_box { border: 1px solid #888; border-radius: 10px; padding: 0 .3em; }
 #search-results { margin-top: 1em; }
+
+#albums-tab { height: 95%; }
+#albums-list { overflow: auto; max-height: 100%; }
+.album-tile { width: 128px; display: inline-block; vertical-align: top; padding: 1em; }
+.album-tile a { text-decoration: none; }
+.album-tile a:hover { text-decoration: underline; }
+.album-tile .album-name { font-size: x-small; }

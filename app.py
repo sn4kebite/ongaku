@@ -80,16 +80,46 @@ class JSONApplication(object):
 		start_response('200 OK', [])
 		return json.dumps(results)
 
+	def albums(self, environ, start_response, path):
+		page = int(path[1] if len(path) > 1 else 0)
+		page_size = config.getint('album_pagesize', default = 75)
+		try:
+			session = db.Session()
+			albums = session.query(db.Album).offset(page*page_size).limit(page_size)
+			results = [{'id': a.id, 'name': a.name, 'artist': {'name': a.artist.name}} for a in albums]
+		finally:
+			session.close()
+
+		start_response('200 OK', [])
+		return json.dumps(results)
+
+	def album(self, environ, start_response, path):
+		album = int(path[1])
+		try:
+			session = db.Session()
+			album = session.query(db.Album).filter(db.Album.id == album).one()
+			results = [self.format_track(x) for x in album.tracks]
+		finally:
+			session.close()
+
+		start_response('200 OK', [])
+		return json.dumps(results)
+
 	handlers = {
 		'list': list,
 		'hint': hint,
 		'search': search,
+		'albums': albums,
+		'album': album,
 	}
 
 	def __call__(self, environ, start_response, path):
 		module = path[0]
 		if module in self.handlers:
 			return self.handlers[module](self, environ, start_response, path)
+		else:
+			start_response('404 Not Found', [])
+			return []
 
 class Application(object):
 	rfc1123_format = '%a, %d %b %Y %H:%M:%S +0000'
@@ -163,11 +193,32 @@ class Application(object):
 
 		return self._serve_path(environ, start_response, filename)
 
+	def album_cover(self, environ, start_response, path):
+		album = int(path[1].split('.')[0])
+		session = db.Session()
+		cover = None
+		try:
+			album = db.Album.get_by_id(session, album)
+			import coverart
+			cover = coverart.get_coverart(album)
+		except db.NoResultFound:
+			start_response('404 Not Found', [])
+			return []
+		finally:
+			session.close()
+
+		if not cover:
+			start_response('302 Found', [('Location', '/static/nocover.jpg')])
+			return []
+
+		return self._serve_path(environ, start_response, cover)
+
 	handlers = {
 		'json': json,
 		'static': static,
 		'file': file,
 		'track': track,
+		'album-cover': album_cover,
 	}
 
 	def __call__(self, environ, start_response):

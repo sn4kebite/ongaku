@@ -118,6 +118,10 @@ class Album(Base):
 			session.commit()
 		return album
 
+	@staticmethod
+	def get_by_id(session, id):
+		return session.query(Album).filter(Album.id == id).one()
+
 class Track(Base):
 	__tablename__ = 'tracks'
 
