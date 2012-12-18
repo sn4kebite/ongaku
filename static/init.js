@@ -139,7 +139,7 @@ function add_albums(data) {
 }
 
 function setup_album_scrolling() {
-	$('#albums-list').scroll(function(event) {
+	$('#albums-tab').scroll(function(event) {
 		if(albums_end)
 			return;
 		var scrolltop = event.target.scrollTop;
