@@ -42,19 +42,32 @@ function load_directory(dir_id, dir_item) {
 				))
 			);
 		}
+		// FIXME: Lots of duplicate code in here.
 		$.each(data, function(i, item) {
-			var el = $(templates.directory_item(item));
+			var el = $(templates.track_item(item));
 			var id = el.attr('id');
 			if(item.type == "track") {
 				el.data('track', item);
-				// FIXME: This doesn't work with selectable
-				/*$(el, 'a').dblclick(function() {
-					console.log('track: ', item);
+				$(el, 'a.play').dblclick(function() {
+					console.log('track dblclick:', item);
 					playlist.add(item);
 					return true;
-				}).click(function() {
+				}).click(function(event) {
+					// TODO: Check that doing this doesn't cause any weird bugs with selectable.
+					if(!event.ctrlKey)
+						track_list.find('.ui-selected').removeClass('ui-selected');
+					$(el).addClass('ui-selected');
+					$('#directory-add').prop('disabled', track_list.find('.ui-selected').length == 0);
 					return false;
-				});*/
+				});
+				$(el, 'a.album').click(function() {
+					var album = {
+						id: item.metadata.album_id,
+						name: item.metadata.album
+					};
+					show_album(album);
+					return false;
+				});
 				track_list.append(el);
 			} else if(item.type == "dir") {
 				$(el).click(function() {
@@ -66,6 +79,7 @@ function load_directory(dir_id, dir_item) {
 		});
 		track_list.selectable({
 			filter: 'tr',
+			distance: 5,
 			stop: function(event, ui) {
 				$('#directory-add').prop('disabled', track_list.find('.ui-selected').length == 0);
 				return true;
@@ -79,25 +93,40 @@ function set_tracks(container, select, click) {
 	return (function(tracks) {
 		container.empty();
 		$.each(tracks, function(i, track) {
-			var el = $(templates.directory_item(track));
+			var el = $(templates.track_item(track));
 			el.data('track', track);
-			if(click !== undefined) {
-				el.find('a').click(function(event) {
-					click(event, track);
-				});
-			}
+			el.find('a.track').dblclick(function() {
+				playlist.add(track);
+				return true;
+			}).click(function(event) {
+				if(click !== undefined)
+					return click(event, track);
+				// TODO: Check that doing this doesn't cause any weird bugs with selectable.
+				if(!event.ctrlKey)
+					container.find('.ui-selected').removeClass('ui-selected');
+				$(el).addClass('ui-selected');
+				select.prop('disabled', container.find('.ui-selected').length == 0);
+				return false;
+			});
+			el.find('a.album').click(function(event) {
+				var album = {
+					id: track.metadata.album_id,
+					name: track.metadata.album
+				};
+				show_album(album);
+				return false;
+			});
 			container.append(el);
 		});
-		if(select !== undefined) {
-			container.selectable({
-				filter: 'tr',
-				stop: function(event, ui) {
-					select.prop('disabled', $(container, ' .ui-selected').length == 0);
-					return true;
-				}
-			});
-			select.prop('disabled', true);
-		}
+		container.selectable({
+			filter: 'tr',
+			distance: 5,
+			stop: function(event, ui) {
+				select.prop('disabled', $(container, '.ui-selected').length == 0);
+				return true;
+			}
+		});
+		select.prop('disabled', true);
 	});
 }
 

@@ -24,6 +24,14 @@ $(function(){
 				playsound(model);
 				return false;
 			});
+			$('a.album', this.el).click(function() {
+				var album = {
+					id: model.attributes.metadata.album_id,
+					name: model.attributes.metadata.album
+				};
+				show_album(album);
+				return false;
+			});
 			$('a.delete', this.el).click(function() {
 				items.remove(model);
 				playlist.hintnext();

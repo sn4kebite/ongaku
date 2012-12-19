@@ -196,7 +196,10 @@ class Track(Base):
 		if self.artist:
 			metadata['artist'] = self.artist.name
 		if self.album:
-			metadata['album'] = self.album.name
+			metadata.update({
+				'album': self.album.name,
+				'album_id': self.album.id,
+			})
 		return metadata
 
 	def dict(self):
