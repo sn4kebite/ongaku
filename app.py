@@ -59,6 +59,10 @@ class JSONApplication(object):
 	def search(self, environ, start_response, path):
 		args = cgi.FieldStorage(environ = environ)
 		query = args.getvalue('q')
+		if not (query or '').strip():
+			start_response('200 OK', [])
+			return json.dumps({'total': 0, 'results': []})
+
 		r = self.re_search.findall(query)
 		d = {}
 		l = []
@@ -69,16 +73,21 @@ class JSONApplication(object):
 			else:
 				l.append(v)
 
+		total_results = 0
 		results = []
 		try:
 			session = db.Session()
 			r = db.Track.search(session, *l, **d)
-			results = [self.format_track(x) for x in r]
+			total_results = r.count()
+			results = [self.format_track(x) for x in r.limit(100)]
 		finally:
 			session.close()
 
 		start_response('200 OK', [])
-		return json.dumps(results)
+		return json.dumps({
+			'total': total_results,
+			'results': results,
+		})
 
 	def albums(self, environ, start_response, path):
 		page = int(path[1] if len(path) > 1 else 0)

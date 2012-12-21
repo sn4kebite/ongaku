@@ -177,11 +177,16 @@ class Track(Base):
 				r = r.join(f)
 			if n in kwargs:
 				r = r.filter(f.name.ilike('%{0}%'.format(kwargs[n])))
+			s_and = []
 			for i in args:
-				s_or.append(f.name.ilike('%{0}%'.format(i)))
+				s_and.append(f.name.ilike('%{0}%'.format(i)))
+			s_or.append(and_(*s_and))
 		if len(s_or):
 			r = r.filter(or_(*s_or))
-		return r.all()
+		r = r#.limit(100)
+		#.all()
+		#print r
+		return r
 
 	def get_path(self):
 		return os.path.join(self.directory.path, self.filename)

@@ -236,8 +236,17 @@ $(document).ready(function() {
 	});
 	$('#search_box').keypress(function(event) {
 		if(event.keyCode == 13) {
+			$('#search-results').empty();
+			$('#search-results').append('<tr><td colspan="3"><img src="/static/icons/loading.gif" alt="Searching..." /> Searching...</td></tr>');
 			var val = $(this).val();
-			$.get('/json/search?q=' + encodeURIComponent(val), set_tracks($('#search-results'), $('#search-add')), 'json');
+			$.get('/json/search?q=' + encodeURIComponent(val), function(data) {
+				var s = 'Showing ' + data.results.length;
+				if(data.total > data.results.length)
+					s += ' of ' + data.total;
+				s += ' results.';
+				$('#search-info').text(s);
+				set_tracks($('#search-results'), $('#search-add'))(data.results);
+			}, 'json');
 		}
 	});
 	$('#search-add').click(function(event) {
