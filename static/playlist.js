@@ -51,6 +51,10 @@ $(function(){
 		},
 		add: function(item) {
 			item.order_id = items.length+1;
+			// Don't add existing items to playlist.
+			if(items.get(item.id)) {
+				return;
+			}
 			var model = items.create(item);
 			if(items.indexOf(model) < 2) {
 				sound_hint(model);
