@@ -135,8 +135,8 @@ class Track(Base):
 	album_id = Column(Integer, ForeignKey('albums.id'))
 
 	directory = relationship(Directory, backref = backref('tracks', order_by = filename))
-	artist = relationship(Artist, backref = backref('tracks'))
-	album = relationship(Album, backref = backref('tracks'))
+	artist = relationship(Artist, backref = backref('tracks', order_by = [num, file_index, filename, name]))
+	album = relationship(Album, backref = backref('tracks', order_by = [num, file_index, filename, name]), order_by = name)
 
 	def __init__(self, name, num, filename, file_index, directory_id, artist_id, album_id):
 		self.name = name
