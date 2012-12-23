@@ -199,7 +199,10 @@ class Track(Base):
 		if self.name:
 			metadata['title'] = self.name
 		if self.artist:
-			metadata['artist'] = self.artist.name
+			metadata.update({
+				'artist': self.artist.name,
+				'artist_id': self.artist.id,
+			})
 		if self.album:
 			metadata.update({
 				'album': self.album.name,

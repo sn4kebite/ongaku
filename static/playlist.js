@@ -24,6 +24,14 @@ $(function(){
 				playsound(model);
 				return false;
 			});
+			$('a.artist', this.el).click(function() {
+				var artist = {
+					id: model.attributes.metadata.artist_id,
+					name: model.attributes.metadata.artist
+				};
+				show_artist(artist);
+				return false;
+			});
 			$('a.album', this.el).click(function() {
 				var album = {
 					id: model.attributes.metadata.album_id,

@@ -21,6 +21,16 @@ class JSONApplication(object):
 		d['cache'] = JSONApplication.cache_check(track)
 		return d
 
+	@staticmethod
+	def format_album(album, artist = False):
+		d = {
+			'id': album.id,
+			'name': album.name,
+		}
+		if artist:
+			d['artist'] = {'name': album.artist.name}
+		return d
+
 	def list(self, environ, start_response, path):
 		root_id = int(path[1]) if len(path) > 1 and len(path[1]) else 0
 		session = db.Session()
@@ -95,7 +105,7 @@ class JSONApplication(object):
 		try:
 			session = db.Session()
 			albums = session.query(db.Album).offset(page*page_size).limit(page_size)
-			results = [{'id': a.id, 'name': a.name, 'artist': {'name': a.artist.name}} for a in albums]
+			results = [self.format_album(a, artist = True) for a in albums]
 		finally:
 			session.close()
 
@@ -114,12 +124,29 @@ class JSONApplication(object):
 		start_response('200 OK', [])
 		return json.dumps(results)
 
+	def artist(self, environ, start_response, path):
+		artist = int(path[1])
+		try:
+			session = db.Session()
+			artist = session.query(db.Artist).filter(db.Artist.id == artist).one()
+			results = {
+				'id': artist.id,
+				'name': artist.name,
+				'albums': [self.format_album(a) for a in artist.albums],
+			}
+		finally:
+			session.close()
+
+		start_response('200 OK', [])
+		return json.dumps(results)
+
 	handlers = {
 		'list': list,
 		'hint': hint,
 		'search': search,
 		'albums': albums,
 		'album': album,
+		'artist': artist,
 	}
 
 	def __call__(self, environ, start_response, path):

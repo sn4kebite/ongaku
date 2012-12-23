@@ -60,7 +60,15 @@ function load_directory(dir_id, dir_item) {
 					$('#directory-add').prop('disabled', track_list.find('.ui-selected').length == 0);
 					return false;
 				});
-				$(el, 'a.album').click(function() {
+				el.find('a.artist').click(function() {
+					var artist = {
+						id: item.metadata.artist_id,
+						name: item.metadata.artist
+					};
+					show_artist(artist);
+					return false;
+				});
+				el.find('a.album').click(function() {
 					var album = {
 						id: item.metadata.album_id,
 						name: item.metadata.album
@@ -108,6 +116,14 @@ function set_tracks(container, select, click) {
 				select.prop('disabled', container.find('.ui-selected').length == 0);
 				return false;
 			});
+			el.find('a.artist').click(function(event) {
+				var artist = {
+					id: track.metadata.artist_id,
+					name: track.metadata.artist
+				};
+				show_artist(artist);
+				return false;
+			});
 			el.find('a.album').click(function(event) {
 				var album = {
 					id: track.metadata.album_id,
@@ -128,6 +144,30 @@ function set_tracks(container, select, click) {
 		});
 		select.prop('disabled', true);
 	});
+}
+
+function show_artist(artist) {
+	var tabs = $('#tabs');
+	var tabid = '#artist-tab-' + artist.id;
+	var tab = $(tabid);
+	if(tab.length > 0) {
+		tabs.tabs('select', tab.index()-1);
+		return;
+	}
+	var tabli = $(templates.artist_tabli({tabid: tabid, artist: artist}));
+	tabs.find('.ui-tabs-nav').append(tabli);
+	var tab = $(templates.artist_tab(artist));
+	tabs.append(tab).tabs('refresh');
+	$.get('/json/artist/' + artist.id, function(data) {
+		var albums = [];
+		$.each(data.albums, function(i, album) {
+			album.artist = {id: data.id, name: data.name};
+			albums.push(album);
+		});
+		tab.empty();
+		add_albums(tabid, albums);
+	}, 'json');
+	tabs.tabs('select', tab.index()-1);
 }
 
 function show_album(album) {
@@ -155,8 +195,8 @@ function show_album(album) {
 	tabs.tabs('select', tab.index()-1);
 }
 
-function add_albums(data) {
-	var div = $('#albums-list');
+function add_albums(selector, data) {
+	var div = $(selector);
 	$.each(data, function(i, album) {
 		var el = $(templates.albums_item(album));
 		el.find('a').click(function() {
@@ -190,7 +230,7 @@ function load_albums(initiate_scrolling) {
 	albums_loading = true;
 	$.get('/json/albums/' + page, function(data) {
 		if(data.length > 0)
-			add_albums(data);
+			add_albums('#albums-list', data);
 		else
 			albums_end = true;
 		if(initiate_scrolling == true)

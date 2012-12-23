@@ -17,8 +17,9 @@ html, body, #content { height: 100%; }
 .track-table tr.ui-selected td { background-color: #fea; }
 .track-table tr:hover td { background-color: #fbb; }
 
-.track-table a { color: inherit; text-decoration: inherit; background-repeat: no-repeat; padding-left: 20px; display: block; }
+.track-table a { color: inherit; text-decoration: inherit; display: block; }
 .track-table a:hover { text-decoration: underline; }
+.track-table a.track, .track-table a.dir { background-repeat: no-repeat; padding-left: 20px; }
 .track-table .dir { background-image: url('/static/icons/folder.png'); }
 .track-table .track { background-image: url('/static/icons/music.png'); }
 .track-table .track.nocache { background-image: url('/static/icons/music_nocache.png'); }
