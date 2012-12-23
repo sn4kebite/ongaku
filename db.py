@@ -180,12 +180,10 @@ class Track(Base):
 			s_and = []
 			for i in args:
 				s_and.append(f.name.ilike('%{0}%'.format(i)))
-			s_or.append(and_(*s_and))
+			if len(s_and):
+				s_or.append(and_(*s_and))
 		if len(s_or):
 			r = r.filter(or_(*s_or))
-		r = r#.limit(100)
-		#.all()
-		#print r
 		return r
 
 	def get_path(self):
