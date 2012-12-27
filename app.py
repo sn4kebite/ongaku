@@ -277,7 +277,9 @@ if __name__ == '__main__':
 		WSGIServer(Application(), bindAddress = (sys.argv[1], int(sys.argv[2]))).run()
 	else:
 		from wsgiref.simple_server import make_server, WSGIServer
+		from SocketServer import ThreadingMixIn
+		class ThreadingWSGIServer(ThreadingMixIn, WSGIServer): pass
 		# enable IPv6
-		WSGIServer.address_family |= 10
-		httpd = make_server('', 8000, Application())
+		ThreadingWSGIServer.address_family |= 10
+		httpd = make_server('', 8000, Application(), server_class = ThreadingWSGIServer)
 		httpd.serve_forever()
