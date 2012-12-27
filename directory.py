@@ -142,4 +142,9 @@ def scan(root = None):
 		session.close()
 
 if __name__ == '__main__':
-	scan()
+	import sys
+	if len(sys.argv) > 1:
+		for root in sys.argv[1:]:
+			scan(root)
+	else:
+		scan()
