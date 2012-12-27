@@ -153,7 +153,8 @@ class Track(Base):
 	@staticmethod
 	def get(session, name, num, filename, file_index, directory_id, artist_id, album_id):
 		try:
-			track = session.query(Track).filter(and_(Track.filename == filename, Track.file_index == file_index)).one()
+			track = session.query(Track).filter(and_(Track.name == name, Track.filename == filename, Track.file_index == file_index,
+				Track.artist_id == artist_id, Track.album_id == album_id)).one()
 		except NoResultFound:
 			track = Track(name, num, filename, file_index, directory_id, artist_id, album_id)
 			session.add(track)
